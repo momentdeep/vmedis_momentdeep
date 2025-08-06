@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediksi Penjualan - Sales Prediction Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .form-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input[type="file"],
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f7fafc;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Radio Button Styling */
+        .radio-group {
+            margin: 2rem 0;
+        }
+
+        .radio-group-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .radio-group-title::before {
+            content: "⚙️";
+            font-size: 1.2rem;
+        }
+
+        .radio-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .radio-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .radio-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .radio-option:hover .radio-card {
+            border-color: #667eea;
+            background: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-card {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-card::before {
+            transform: scaleX(1);
+        }
+
+        .radio-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .radio-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .radio-option:hover .radio-icon,
+        .radio-option input[type="radio"]:checked + .radio-card .radio-icon {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .radio-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .radio-description {
+            color: #718096;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .radio-features {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .radio-features ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .radio-features li {
+            font-size: 0.85rem;
+            color: #4a5568;
+            margin-bottom: 0.25rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .radio-features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .results-section {
+            margin-top: 3rem;
+        }
+
+        .results-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .results-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .results-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: inset 0 0 0 1px #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            min-width: 600px;
+        }
+
+        table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            transition: background-color 0.2s ease;
+        }
+
+        table tr:hover td {
+            background-color: #f7fafc;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .visualization-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 2rem;
+        }
+
+        .visualization-container h2 {
+            color: #2d3748;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-wrapper {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: inline-block;
+            background: white;
+            padding: 1rem;
+        }
+
+        .download-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(72, 187, 120, 0.3);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(72, 187, 120, 0.4);
+        }
+
+        .loading-state {
+            display: none;
+            text-align: center;
+            color: white;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .form-card {
+                padding: 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .radio-options {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                padding: 1rem;
+            }
+
+            .table-wrapper {
+                margin: -1rem;
+                padding: 1rem;
+            }
+
+            table th,
+            table td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .visualization-container {
+                padding: 1rem;
+            }
+
+            .chart-wrapper img {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-card {
+                padding: 1rem;
+            }
+
+            .radio-card {
+                padding: 1rem;
+            }
+
+            .radio-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .radio-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            table th,
+            table td {
+                padding: 0.5rem 0.25rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Custom scrollbar for table */
+        .table-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 Moment Deep</h1>
+            <p>Sistem Prediksi Penjualan Produk dengan Machine Learning</p>
+        </div>
+
+        <div class="form-card">
+            <form method="POST" enctype="multipart/form-data" onsubmit="showLoading()">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="file">📁 Pilih File Excel (.xls)</label>
+                        {% if session.get('uploaded') %}
+    <input type="file" name="file" id="file" accept=".xls,.xlsx">
+    <small style="color: green;">✔️ File sudah diunggah. Tidak perlu unggah ulang jika tidak ingin mengubah data.</small>
+{% else %}
+    <input type="file" name="file" id="file" accept=".xls,.xlsx" required>
+{% endif %}
+
+                    </div>
+                    <div class="form-group">
+                        <label for="n_predict">📊 Jumlah Bulan Prediksi</label>
+                        <input type="number" name="n_predict" id="n_predict" value="" min="1" max="24" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="alpha">⚡ Alpha (0-1)</label>
+                        <input type="number" name="alpha" id="alpha" value="" min="0.1" max="1.0" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sediaan">📦 Sediaan Awal</label>
+                        <input type="number" name="sediaan" id="sediaan" value="" min="0" required>
+                    </div>
+                </div>
+
+                <div class="radio-group">
+                    <h3 class="radio-group-title">Pilih Jenis Stabilitas Analisis</h3>
+                    <div class="radio-options">
+                        <label class="radio-option">
+                            <input type="radio" name="mode" value="produk" checked>
+                            <div class="radio-card">
+                                <div class="radio-header">
+                                    <div class="radio-icon">📦</div>
+                                    <div>
+                                        <h4 class="radio-title">Stabilitas Produk</h4>
+                                        <p class="radio-description">Fokus pada analisis stabilitas penjualan produk</p>
+                                    </div>
+                                </div>
+                                <div class="radio-features">
+                                    <ul>
+                                        <li>Analisis trend penjualan per produk</li>
+                                        <li>Prediksi permintaan berdasarkan historis</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="radio-option">
+                            <input type="radio" name="mode" value="sediaan">
+                            <div class="radio-card">
+                                <div class="radio-header">
+                                    <div class="radio-icon">📊</div>
+                                    <div>
+                                        <h4 class="radio-title">Stabilitas Sediaan</h4>
+                                        <p class="radio-description">Fokus pada manajemen dan stabilitas inventori</p>
+                                    </div>
+                                </div>
+                                <div class="radio-features">
+                                    <ul>
+                                        <li>Analisis level stok optimal</li>
+                                        <li>Prediksi kebutuhan restock</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button type="submit" class="submit-btn">Mulai Prediksi</button>
+                </div>
+                <div class="loading-state" id="loadingState">
+                    <div class="loading-spinner"></div>
+                    Memproses data dan membuat prediksi...
+                </div>
+            </form>
+        </div>
+
+        {% if tables %}
+        <div class="results-section">
+            <div class="results-header">
+                <h2>🎯 Hasil Prediksi</h2>
+                <p>Analisis menggunakan Trend Moment, LSTM, dan Ensemble Method</p>
+            </div>
+
+            {% for title, table in tables.items() %}
+            <div class="table-container">
+                <div class="table-title">{{ title }}</div>
+                <div class="table-wrapper">
+                    {{ table|safe }}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="visualization-container">
+                <h2>📊 Visualisasi Data</h2>
+                <div class="chart-wrapper">
+                    <img src="{{ url_for('static', filename='plot.png') }}" alt="Grafik Prediksi Penjualan" style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+            
+            <div class="download-section">
+                <a href="{{ url_for('download_excel') }}" class="download-btn">
+                     Download Hasil Excel
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function showLoading() {
+            document.getElementById('loadingState').style.display = 'block';
+            document.querySelector('.submit-btn').style.opacity = '0.7';
+            document.querySelector('.submit-btn').innerHTML = '⏳ Memproses...';
+        }
+
+        // Add dynamic column preview based on prediction months
+        document.getElementById('n_predict').addEventListener('input', function(e) {
+            const months = parseInt(e.target.value);
+            const preview = document.getElementById('columnPreview');
+            if (preview) {
+                preview.textContent = `Akan menghasilkan ${months} kolom prediksi`;
+            }
+        });
+
+        // Add alpha parameter tooltip/help
+        const alphaInput = document.getElementById('alpha');
+        alphaInput.addEventListener('focus', function() {
+            if (!document.getElementById('alphaTooltip')) {
+                const tooltip = document.createElement('div');
+                tooltip.id = 'alphaTooltip';
+                tooltip.style.cssText = `
+                    position: absolute;
+                    background: #2d3748;
+                    color: white;
+                    padding: 0.5rem;
+                    border-radius: 8px;
+                    font-size: 0.8rem;
+                    margin-top: 0.5rem;
+                    max-width: 250px;
+                    z-index: 1000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                `;
+                tooltip.textContent = 'Alpha mengontrol seberapa cepat model beradaptasi dengan perubahan data. Nilai lebih tinggi = lebih responsif terhadap perubahan terbaru.';
+                alphaInput.parentNode.appendChild(tooltip);
+            }
+        });
+
+        alphaInput.addEventListener('blur', function() {
+            const tooltip = document.getElementById('alphaTooltip');
+            if (tooltip) {
+                tooltip.remove();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // File input enhancement
+            const fileInput = document.getElementById('file');
+            fileInput.addEventListener('change', function(e) {
+                const fileName = e.target.files[0]?.name;
+                if (fileName) {
+                    console.log('File selected:', fileName);
+                }
+            });
+
+            // Add smooth scrolling to results when they appear
+            const resultsSection = document.querySelector('.results-section');
+            if (resultsSection) {
+                setTimeout(() => {
+                    resultsSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }, 500);
+            }
+
+            // Radio button interaction effects
+            const radioOptions = document.querySelectorAll('.radio-option input[type="radio"]');
+            radioOptions.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    // Add a subtle animation when selection changes
+                    const selectedCard = this.nextElementSibling;
+                    selectedCard.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        selectedCard.style.transform = '';
+                    }, 200);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
